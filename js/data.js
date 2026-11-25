@@ -411,3 +411,105 @@ export const curadoriaTestimonials = [
     avatar: "CA"
   }
 ];
+
+// Métricas analíticas por imóvel (tempo de anúncio, acessos de clientes e leads)
+export const propertyMetricsSeed = {
+  "cc-01": { daysListed: 18, listedDate: "2026-11-07", clientViews: 1420, uniqueClients: 890, leadsCount: 34, scheduledVisits: 9, lastAccess: "Há 12 min" },
+  "cc-02": { daysListed: 32, listedDate: "2026-10-24", clientViews: 1890, uniqueClients: 1150, leadsCount: 41, scheduledVisits: 12, lastAccess: "Há 5 min" },
+  "cc-03": { daysListed: 14, listedDate: "2026-11-11", clientViews: 980, uniqueClients: 640, leadsCount: 27, scheduledVisits: 7, lastAccess: "Há 28 min" },
+  "cc-04": { daysListed: 45, listedDate: "2026-10-11", clientViews: 840, uniqueClients: 520, leadsCount: 19, scheduledVisits: 5, lastAccess: "Há 1 hora" },
+  "cc-05": { daysListed: 21, listedDate: "2026-11-04", clientViews: 1650, uniqueClients: 1020, leadsCount: 38, scheduledVisits: 11, lastAccess: "Há 8 min" },
+  "cc-06": { daysListed: 60, listedDate: "2026-09-26", clientViews: 760, uniqueClients: 490, leadsCount: 22, scheduledVisits: 8, lastAccess: "Há 3 horas" },
+  "cc-07": { daysListed: 39, listedDate: "2026-10-17", clientViews: 1120, uniqueClients: 710, leadsCount: 24, scheduledVisits: 6, lastAccess: "Há 42 min" },
+  "cc-08": { daysListed: 27, listedDate: "2026-10-29", clientViews: 910, uniqueClients: 615, leadsCount: 29, scheduledVisits: 10, lastAccess: "Há 19 min" },
+  "cc-09": { daysListed: 52, listedDate: "2026-10-04", clientViews: 670, uniqueClients: 410, leadsCount: 15, scheduledVisits: 4, lastAccess: "Há 2 horas" },
+  "cc-10": { daysListed: 74, listedDate: "2026-09-12", clientViews: 1540, uniqueClients: 980, leadsCount: 36, scheduledVisits: 14, lastAccess: "Ontem" },
+  "cc-11": { daysListed: 11, listedDate: "2026-11-14", clientViews: 1290, uniqueClients: 830, leadsCount: 31, scheduledVisits: 8, lastAccess: "Há 4 min" },
+  "cc-12": { daysListed: 68, listedDate: "2026-09-18", clientViews: 1080, uniqueClients: 730, leadsCount: 28, scheduledVisits: 9, lastAccess: "Ontem" },
+  "cc-13": { daysListed: 85, listedDate: "2026-09-01", clientViews: 530, uniqueClients: 340, leadsCount: 12, scheduledVisits: 3, lastAccess: "Há 4 horas" },
+  "cc-14": { daysListed: 25, listedDate: "2026-10-31", clientViews: 895, uniqueClients: 580, leadsCount: 21, scheduledVisits: 6, lastAccess: "Há 35 min" }
+};
+
+// Relatórios Gerenciais do Consultor (Dia, Semana, Mês e Ano)
+export const consultantAnalyticsData = {
+  day: {
+    label: "Hoje (Tempo Real)",
+    vgvSold: 13900000,
+    dealsCount: 1,
+    activeViews: 486,
+    newLeads: 18,
+    visitsToday: 7,
+    conversionRate: "4.8%",
+    avgTicket: 13900000,
+    avgDaysOnMarket: 28,
+    seriesTitle: "Acessos & Propostas por Faixa de Horário (Hoje)",
+    series: [
+      { period: "08h", vgv: 0, views: 42, leads: 2 },
+      { period: "10h", vgv: 0, views: 88, leads: 4 },
+      { period: "12h", vgv: 13.9, views: 114, leads: 5 },
+      { period: "14h", vgv: 0, views: 96, leads: 3 },
+      { period: "16h", vgv: 0, views: 84, leads: 2 },
+      { period: "18h", vgv: 0, views: 62, leads: 2 }
+    ]
+  },
+  week: {
+    label: "Últimos 7 Dias",
+    vgvSold: 20750000,
+    dealsCount: 2,
+    activeViews: 3420,
+    newLeads: 94,
+    visitsToday: 29,
+    conversionRate: "5.2%",
+    avgTicket: 10375000,
+    avgDaysOnMarket: 34,
+    seriesTitle: "Desempenho Comercial nos Últimos 7 Dias (VGV em R$ Mi)",
+    series: [
+      { period: "Seg", vgv: 0, views: 410, leads: 12 },
+      { period: "Ter", vgv: 6.85, views: 520, leads: 16 },
+      { period: "Qua", vgv: 0, views: 490, leads: 14 },
+      { period: "Qui", vgv: 0, views: 580, leads: 15 },
+      { period: "Sex", vgv: 13.9, views: 640, leads: 19 },
+      { period: "Sáb", vgv: 0, views: 460, leads: 11 },
+      { period: "Dom", vgv: 0, views: 320, leads: 7 }
+    ]
+  },
+  month: {
+    label: "Mês Atual (Novembro)",
+    vgvSold: 49950000,
+    dealsCount: 4,
+    activeViews: 15575,
+    newLeads: 377,
+    visitsToday: 112,
+    conversionRate: "5.6%",
+    avgTicket: 12487500,
+    avgDaysOnMarket: 38,
+    seriesTitle: "Evolução Semanal no Mês (VGV Fechado em R$ Milhões)",
+    series: [
+      { period: "Semana 1", vgv: 14.8, views: 3650, leads: 86 },
+      { period: "Semana 2", vgv: 14.4, views: 3890, leads: 92 },
+      { period: "Semana 3", vgv: 6.85, views: 4615, leads: 105 },
+      { period: "Semana 4", vgv: 13.9, views: 3420, leads: 94 }
+    ]
+  },
+  year: {
+    label: "Acumulado no Ano (2026)",
+    vgvSold: 384500000,
+    dealsCount: 28,
+    activeViews: 168400,
+    newLeads: 3920,
+    visitsToday: 940,
+    conversionRate: "6.1%",
+    avgTicket: 13732142,
+    avgDaysOnMarket: 41,
+    seriesTitle: "Vendas & VGV Fechado por Trimestre/Mês (R$ Milhões)",
+    series: [
+      { period: "Jan-Fev", vgv: 52.4, views: 24100, leads: 540 },
+      { period: "Mar-Abr", vgv: 68.0, views: 27800, leads: 620 },
+      { period: "Mai-Jun", vgv: 61.2, views: 26500, leads: 590 },
+      { period: "Jul-Ago", vgv: 74.5, views: 31200, leads: 710 },
+      { period: "Set-Out", vgv: 78.45, views: 33200, leads: 790 },
+      { period: "Nov-Dez", vgv: 49.95, views: 25600, leads: 670 }
+    ]
+  }
+};
+

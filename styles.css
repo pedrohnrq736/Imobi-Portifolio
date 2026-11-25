@@ -29,6 +29,36 @@ h1, h2, h3, h4, .font-heading {
   font-family: "Plus Jakarta Sans", sans-serif;
 }
 
+/* Role Switcher (Visão Cliente vs. Área do Consultor) */
+.role-switch-btn {
+  color: #94A3B8;
+}
+
+.role-switch-btn:hover {
+  color: #FFFFFF;
+}
+
+.role-switch-btn.active {
+  background-color: var(--primary-navy);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.45);
+}
+
+/* Period Tabs (Consultant BI Dashboard: Dia, Semana, Mês, Ano) */
+.period-tab {
+  color: #475569;
+}
+
+.period-tab:hover {
+  color: var(--primary-navy);
+}
+
+.period-tab.active {
+  background-color: var(--primary-navy);
+  color: #FFFFFF;
+  box-shadow: 0 2px 10px rgba(30, 58, 138, 0.25);
+}
+
 /* Filter Tabs */
 .filter-tab {
   color: #475569;

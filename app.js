@@ -1,7 +1,13 @@
-import { initialProperties, curadoriaTestimonials } from "./js/data.js";
+import {
+  initialProperties,
+  curadoriaTestimonials,
+  propertyMetricsSeed,
+  consultantAnalyticsData
+} from "./js/data.js";
 
 const STORAGE_KEY = "casa-clara-high-end-v2";
 const FAVORITES_KEY = "casa-clara-favorites-v2";
+const METRICS_KEY = "casa-clara-metrics-v2";
 
 // DOM Elements
 const grid = document.querySelector("#property-grid");
@@ -20,12 +26,113 @@ const favCountBadge = document.querySelector("#fav-count");
 const statusTabs = [...document.querySelectorAll(".filter-tab")];
 
 // State
+let currentRole = "client"; // "client" | "consultant"
+let activeAnalyticsPeriod = "month"; // "day" | "week" | "month" | "year"
 let activeStatus = "all";
 let onlyFavorites = false;
 let onlyFeatured = false;
 let editingId = null;
 let currentDetailId = null;
 let toastTimeout;
+
+function loadMetricsMap() {
+  try {
+    const stored = localStorage.getItem(METRICS_KEY);
+    if (!stored) {
+      localStorage.setItem(METRICS_KEY, JSON.stringify(propertyMetricsSeed));
+      return { ...propertyMetricsSeed };
+    }
+    return { ...propertyMetricsSeed, ...JSON.parse(stored) };
+  } catch {
+    return { ...propertyMetricsSeed };
+  }
+}
+
+let metricsMap = loadMetricsMap();
+
+function saveMetricsMap() {
+  try {
+    localStorage.setItem(METRICS_KEY, JSON.stringify(metricsMap));
+  } catch (err) {
+    console.error("Erro ao salvar métricas:", err);
+  }
+}
+
+function getPropertyMetrics(propertyId) {
+  if (!metricsMap[propertyId]) {
+    metricsMap[propertyId] = {
+      daysListed: 1,
+      listedDate: new Date().toISOString().slice(0, 10),
+      clientViews: 12,
+      uniqueClients: 9,
+      leadsCount: 1,
+      scheduledVisits: 0,
+      lastAccess: "Agora mesmo"
+    };
+  }
+  return metricsMap[propertyId];
+}
+
+function recordClientAccess(propertyId, type = "view") {
+  const m = getPropertyMetrics(propertyId);
+  m.clientViews = (Number(m.clientViews) || 0) + 1;
+  m.uniqueClients = (Number(m.uniqueClients) || 0) + (Math.random() > 0.4 ? 1 : 0);
+  if (type === "lead") {
+    m.leadsCount = (Number(m.leadsCount) || 0) + 1;
+  }
+  if (type === "visit") {
+    m.scheduledVisits = (Number(m.scheduledVisits) || 0) + 1;
+    m.leadsCount = (Number(m.leadsCount) || 0) + 1;
+  }
+  m.lastAccess = "Agora mesmo";
+  saveMetricsMap();
+}
+
+function setRole(role) {
+  currentRole = role === "consultant" ? "consultant" : "client";
+  const isConsultant = currentRole === "consultant";
+
+  document.querySelectorAll("[data-consultant-only]").forEach((el) => {
+    el.hidden = !isConsultant;
+  });
+  document.querySelectorAll("[data-client-only]").forEach((el) => {
+    el.hidden = isConsultant;
+  });
+
+  document.querySelector("#role-client-btn")?.classList.toggle("active", !isConsultant);
+  document.querySelector("#role-consultant-btn")?.classList.toggle("active", isConsultant);
+
+  render();
+  if (isConsultant) {
+    renderConsultantDashboard();
+  }
+  showToast(
+    isConsultant
+      ? "Área do Consultor ativada: BI, gráficos de vendas e exportação Excel liberados."
+      : "Visão do Cliente ativada: navegação, visitas e propostas."
+  );
+}
+
+function selectPropertyForContact(property, intentType = "Agendar Visita Privativa") {
+  const banner = document.querySelector("#selected-property-banner");
+  const nameEl = document.querySelector("#selected-property-name");
+  const hiddenInput = document.querySelector("#selected-property-input");
+  const interestSelect = document.querySelector("#client-interest-select");
+
+  if (banner && nameEl && hiddenInput) {
+    banner.hidden = false;
+    nameEl.textContent = `${property.name} (${formatFullCurrency(property.price)})`;
+    hiddenInput.value = property.name;
+  }
+  if (interestSelect) {
+    interestSelect.value = intentType;
+  }
+
+  document.querySelector("#concierge")?.scrollIntoView({ behavior: "smooth" });
+  setTimeout(() => {
+    document.querySelector('#concierge-form input[name="clientName"]')?.focus();
+  }, 450);
+}
 
 function loadProperties() {
   try {
@@ -180,42 +287,46 @@ function renderCard(property) {
               </svg>
             </button>
 
-            <div class="relative property-menu-wrap">
-              <button
-                type="button"
-                class="property-menu-button w-9 h-9 rounded-full bg-white/90 hover:bg-white text-graphite flex items-center justify-center shadow-md font-bold text-lg leading-none"
-                aria-label="Opções para ${safeName}"
-                aria-expanded="false"
-              >
-                ···
-              </button>
-              <div
-                class="property-actions absolute right-0 top-11 w-40 bg-white rounded-2xl shadow-xl border border-slate-200 p-1.5 z-20"
-                hidden
-              >
-                <button
-                  type="button"
-                  data-action="view-details"
-                  class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center gap-2"
-                >
-                  <span>✦</span> Ver Dossiê
-                </button>
-                <button
-                  type="button"
-                  data-action="edit"
-                  class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center gap-2"
-                >
-                  <span>✎</span> Editar Imóvel
-                </button>
-                <button
-                  type="button"
-                  data-action="delete"
-                  class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2"
-                >
-                  <span>×</span> Remover
-                </button>
-              </div>
-            </div>
+            ${
+              currentRole === "consultant"
+                ? `<div class="relative property-menu-wrap">
+                    <button
+                      type="button"
+                      class="property-menu-button w-9 h-9 rounded-full bg-white/90 hover:bg-white text-graphite flex items-center justify-center shadow-md font-bold text-lg leading-none"
+                      aria-label="Gestão de ${safeName}"
+                      aria-expanded="false"
+                    >
+                      ···
+                    </button>
+                    <div
+                      class="property-actions absolute right-0 top-11 w-40 bg-white rounded-2xl shadow-xl border border-slate-200 p-1.5 z-20"
+                      hidden
+                    >
+                      <button
+                        type="button"
+                        data-action="view-details"
+                        class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center gap-2"
+                      >
+                        <span>✦</span> Ver Dossiê
+                      </button>
+                      <button
+                        type="button"
+                        data-action="edit"
+                        class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center gap-2"
+                      >
+                        <span>✎</span> Editar Imóvel
+                      </button>
+                      <button
+                        type="button"
+                        data-action="delete"
+                        class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2"
+                      >
+                        <span>×</span> Remover
+                      </button>
+                    </div>
+                  </div>`
+                : ""
+            }
           </div>
 
           <!-- Bottom Image Overlay Info -->
@@ -263,32 +374,94 @@ function renderCard(property) {
               <strong class="text-xs font-bold text-graphite">${parking}</strong>
             </div>
           </div>
+
+          ${
+            currentRole === "consultant"
+              ? (() => {
+                  const m = getPropertyMetrics(property.id);
+                  return `
+                  <!-- Consultant Telemetry Bar (Days Listed & Client Accesses) -->
+                  <div class="mt-3 p-3 rounded-2xl bg-navy/5 border border-navy/15 grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <span class="block text-[9px] font-bold uppercase tracking-wider text-slate-400">Anunciado há</span>
+                      <strong class="text-xs font-extrabold text-navy">${m.daysListed} dias</strong>
+                    </div>
+                    <div>
+                      <span class="block text-[9px] font-bold uppercase tracking-wider text-slate-400">Acessos Clientes</span>
+                      <strong class="text-xs font-extrabold text-graphite">${Number(m.clientViews).toLocaleString("pt-BR")}</strong>
+                    </div>
+                    <div>
+                      <span class="block text-[9px] font-bold uppercase tracking-wider text-slate-400">Propostas / Visitas</span>
+                      <strong class="text-xs font-extrabold text-amber-dark">${m.leadsCount} (${m.scheduledVisits} vis.)</strong>
+                    </div>
+                  </div>`;
+                })()
+              : ""
+          }
         </div>
       </div>
 
       <!-- Card Footer Price & Action -->
-      <div class="px-5 pb-5 sm:px-6 sm:pb-6 pt-1 flex items-end justify-between gap-3">
-        <div>
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-            ${isRental ? "Locação Mensal" : "Valor de Aquisição"}
-          </span>
-          <div class="font-heading font-extrabold text-xl text-navy leading-tight">
-            ${formatFullCurrency(property.price)}<span class="text-xs font-normal text-slate-500">${priceSuffix}</span>
+      <div class="px-5 pb-5 sm:px-6 sm:pb-6 pt-1 flex flex-col gap-3">
+        <div class="flex items-end justify-between gap-3">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+              ${isRental ? "Locação Mensal" : "Valor de Aquisição"}
+            </span>
+            <div class="font-heading font-extrabold text-xl text-navy leading-tight">
+              ${formatFullCurrency(property.price)}<span class="text-xs font-normal text-slate-500">${priceSuffix}</span>
+            </div>
+            ${
+              pricePerSqm
+                ? `<span class="text-[11px] text-slate-400">${formatFullCurrency(pricePerSqm)} / m²</span>`
+                : `<span class="text-[11px] text-amber font-medium">Contrato Prime</span>`
+            }
           </div>
-          ${
-            pricePerSqm
-              ? `<span class="text-[11px] text-slate-400">${formatFullCurrency(pricePerSqm)} / m²</span>`
-              : `<span class="text-[11px] text-amber font-medium">Contrato Prime</span>`
-          }
+
+          <button
+            type="button"
+            data-action="view-details"
+            class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-graphite text-xs font-semibold transition-all shrink-0"
+          >
+            Ver Detalhes
+          </button>
         </div>
 
-        <button
-          type="button"
-          data-action="view-details"
-          class="px-4 py-2.5 rounded-xl bg-navy/5 hover:bg-navy text-navy hover:text-white text-xs font-semibold transition-all shrink-0"
-        >
-          Ver Dossiê ↗
-        </button>
+        ${
+          currentRole === "client"
+            ? `<div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  data-action="schedule-visit"
+                  class="px-3 py-2 rounded-xl bg-navy hover:bg-navy-dark text-white text-xs font-semibold transition-all text-center"
+                >
+                  Agendar Visita
+                </button>
+                <button
+                  type="button"
+                  data-action="buy-property"
+                  class="px-3 py-2 rounded-xl border border-amber/40 bg-amber/10 hover:bg-amber text-amber-dark hover:text-white text-xs font-bold transition-all text-center"
+                >
+                  ${isRental ? "Quero Alugar" : "Quero Comprar"}
+                </button>
+              </div>`
+            : `<div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  data-action="edit"
+                  class="px-3 py-2 rounded-xl border border-slate-200 hover:border-navy text-slate-700 hover:text-navy text-xs font-semibold transition-all text-center"
+                >
+                  ✎ Editar Imóvel
+                </button>
+                <button
+                  type="button"
+                  data-action="delete"
+                  class="px-3 py-2 rounded-xl border border-red-200 hover:bg-red-50 text-red-600 text-xs font-semibold transition-all text-center"
+                >
+                  × Excluir
+                </button>
+              </div>`
+        }
       </div>
     </article>
   `;
@@ -388,6 +561,145 @@ function render() {
       : "";
   document.querySelector("#results-label").textContent =
     `Exibindo ${filtered.length} de ${properties.length} propriedades no portfólio${filterNote}`;
+
+  if (currentRole === "consultant") {
+    renderConsultantDashboard();
+  }
+}
+
+function renderConsultantDashboard() {
+  const periodData = consultantAnalyticsData[activeAnalyticsPeriod] || consultantAnalyticsData.month;
+  const periodLabels = { day: "Hoje", week: "Semana", month: "Mês", year: "Ano" };
+
+  const badgeEl = document.querySelector("#bi-period-badge");
+  if (badgeEl) badgeEl.textContent = periodLabels[activeAnalyticsPeriod] || "Mês";
+
+  document.querySelector("#bi-vgv-sold").textContent = formatCompactCurrency(periodData.vgvSold);
+  document.querySelector("#bi-deals-count").textContent = `${periodData.dealsCount} ${periodData.dealsCount === 1 ? "imóvel negociado" : "imóveis negociados"} (${periodData.label})`;
+  document.querySelector("#bi-active-views").textContent = Number(periodData.activeViews).toLocaleString("pt-BR");
+  document.querySelector("#bi-new-leads").textContent = `${Number(periodData.newLeads).toLocaleString("pt-BR")} leads e propostas geradas`;
+  document.querySelector("#bi-avg-dom").textContent = `${periodData.avgDaysOnMarket} dias`;
+  document.querySelector("#bi-conversion-rate").textContent = `Taxa de conversão: ${periodData.conversionRate}`;
+  document.querySelector("#bi-visits-count").textContent = Number(periodData.visitsToday).toLocaleString("pt-BR");
+  document.querySelector("#bi-avg-ticket").textContent = `Ticket médio: ${formatCompactCurrency(periodData.avgTicket)}`;
+  document.querySelector("#bi-chart-title").textContent = periodData.seriesTitle;
+
+  // Render Bar Chart (VGV & Views)
+  const chartContainer = document.querySelector("#bi-sales-chart");
+  if (chartContainer) {
+    const maxVgv = Math.max(...periodData.series.map((s) => s.vgv), 1);
+    const maxViews = Math.max(...periodData.series.map((s) => s.views), 1);
+
+    chartContainer.innerHTML = periodData.series
+      .map((item) => {
+        const vgvHeightPct = Math.max(Math.round((item.vgv / maxVgv) * 100), item.vgv > 0 ? 15 : 4);
+        const viewsHeightPct = Math.max(Math.round((item.views / maxViews) * 100), 12);
+        return `
+          <div class="flex-1 flex flex-col items-center justify-end h-full group">
+            <div class="w-full flex items-end justify-center gap-1.5 h-44 px-1">
+              <!-- VGV Bar -->
+              <div class="flex-1 max-w-[26px] flex flex-col items-center justify-end h-full">
+                <span class="text-[9px] font-bold text-navy mb-1 opacity-85 group-hover:opacity-100">
+                  ${item.vgv > 0 ? `${item.vgv}M` : "-"}
+                </span>
+                <div
+                  class="w-full rounded-t-lg bg-navy group-hover:bg-navy-dark transition-all"
+                  style="height: ${vgvHeightPct}%"
+                  title="VGV: R$ ${item.vgv} milhões"
+                ></div>
+              </div>
+              <!-- Views Bar -->
+              <div class="flex-1 max-w-[26px] flex flex-col items-center justify-end h-full">
+                <span class="text-[9px] font-bold text-amber-dark mb-1 opacity-85 group-hover:opacity-100">
+                  ${item.views.toLocaleString("pt-BR")}
+                </span>
+                <div
+                  class="w-full rounded-t-lg bg-amber group-hover:bg-amber-dark transition-all"
+                  style="height: ${viewsHeightPct}%"
+                  title="Acessos: ${item.views.toLocaleString("pt-BR")} clientes (${item.leads} leads)"
+                ></div>
+              </div>
+            </div>
+            <span class="text-[11px] font-bold text-slate-600 mt-2">${escapeHTML(item.period)}</span>
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+  // Render Top 5 Accessed Properties & Days on Market
+  const topContainer = document.querySelector("#bi-top-properties");
+  const sortedByViews = [...properties]
+    .map((p) => ({ ...p, metrics: getPropertyMetrics(p.id) }))
+    .sort((a, b) => b.metrics.clientViews - a.metrics.clientViews);
+
+  const maxPropViews = Math.max(...sortedByViews.map((p) => p.metrics.clientViews), 1);
+
+  if (topContainer) {
+    topContainer.innerHTML = sortedByViews
+      .slice(0, 5)
+      .map((p) => {
+        const pct = Math.max(Math.round((p.metrics.clientViews / maxPropViews) * 100), 10);
+        return `
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-xs">
+              <strong class="font-semibold text-graphite truncate max-w-[58%]" title="${escapeHTML(p.name)}">
+                ${escapeHTML(p.name)}
+              </strong>
+              <div class="flex items-center gap-2 text-[11px] shrink-0">
+                <span class="px-2 py-0.5 rounded bg-slate-200/75 text-slate-700 font-semibold">
+                  ${p.metrics.daysListed} dias anunciado
+                </span>
+                <strong class="text-navy font-extrabold">
+                  ${p.metrics.clientViews.toLocaleString("pt-BR")} acessos
+                </strong>
+              </div>
+            </div>
+            <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+              <div class="h-full rounded-full bg-gradient-to-r from-navy to-amber" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+  }
+
+  // Render Full Audit Table
+  const tbody = document.querySelector("#bi-properties-tbody");
+  if (tbody) {
+    tbody.innerHTML = sortedByViews
+      .map(
+        (p) => `
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="py-3 px-4 font-semibold text-graphite">
+            ${escapeHTML(p.name)}
+            <span class="block text-[10px] text-slate-400 font-normal">${escapeHTML(p.neighborhood || p.address)}</span>
+          </td>
+          <td class="py-3 px-3">
+            <span class="font-semibold text-slate-700">${escapeHTML(p.type)}</span>
+            <span class="block text-[10px] font-bold ${p.status === "Vendido" ? "text-emerald-700" : p.status === "Alugado" ? "text-amber-dark" : "text-navy"}">
+              ${escapeHTML(p.status)}
+            </span>
+          </td>
+          <td class="py-3 px-3 font-bold text-navy">${formatFullCurrency(p.price)}</td>
+          <td class="py-3 px-3">
+            <strong class="text-graphite">${p.metrics.daysListed} dias</strong>
+            <span class="block text-[10px] text-slate-400">Desde ${escapeHTML(p.metrics.listedDate)}</span>
+          </td>
+          <td class="py-3 px-3">
+            <strong class="text-graphite">${p.metrics.clientViews.toLocaleString("pt-BR")} views</strong>
+            <span class="block text-[10px] text-slate-400">${p.metrics.uniqueClients.toLocaleString("pt-BR")} clientes únicos</span>
+          </td>
+          <td class="py-3 px-3">
+            <strong class="text-amber-dark">${p.metrics.leadsCount} propostas</strong>
+            <span class="block text-[10px] text-slate-500">${p.metrics.scheduledVisits} visitas agendadas</span>
+          </td>
+          <td class="py-3 px-4 text-slate-500 font-medium">${escapeHTML(p.metrics.lastAccess)}</td>
+        </tr>
+      `
+      )
+      .join("");
+  }
 }
 
 function renderTestimonials() {
@@ -592,10 +904,31 @@ document.querySelector("#detail-simulate-btn").addEventListener("click", () => {
 });
 
 document.querySelector("#detail-schedule-btn").addEventListener("click", () => {
+  const prop = properties.find((p) => p.id === currentDetailId);
   closeDetailModal();
-  document.querySelector("#concierge")?.scrollIntoView({ behavior: "smooth" });
-  document.querySelector('#concierge-form input[name="clientName"]')?.focus();
+  if (prop) {
+    selectPropertyForContact(prop, "Agendar Visita Privativa");
+  }
 });
+
+document.querySelector("#detail-buy-btn")?.addEventListener("click", () => {
+  const prop = properties.find((p) => p.id === currentDetailId);
+  closeDetailModal();
+  if (prop) {
+    selectPropertyForContact(prop, "Proposta de Compra / Aquisição");
+  }
+});
+
+document.querySelector("#clear-selected-property")?.addEventListener("click", () => {
+  const banner = document.querySelector("#selected-property-banner");
+  const hiddenInput = document.querySelector("#selected-property-input");
+  if (banner) banner.hidden = true;
+  if (hiddenInput) hiddenInput.value = "";
+});
+
+// Role Switcher Buttons
+document.querySelector("#role-client-btn")?.addEventListener("click", () => setRole("client"));
+document.querySelector("#role-consultant-btn")?.addEventListener("click", () => setRole("consultant"));
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
@@ -711,16 +1044,34 @@ grid.addEventListener("click", (e) => {
   }
 
   if (action === "view-details") {
+    recordClientAccess(property.id, "view");
     openDetailModal(property);
+    render();
     return;
   }
 
-  if (action === "edit") {
+  if (action === "schedule-visit") {
+    recordClientAccess(property.id, "visit");
+    selectPropertyForContact(property, "Agendar Visita Privativa");
+    render();
+    showToast(`Agende sua visita para "${property.name}".`);
+    return;
+  }
+
+  if (action === "buy-property") {
+    recordClientAccess(property.id, "lead");
+    selectPropertyForContact(property, "Proposta de Compra / Aquisição");
+    render();
+    showToast(`Inicie sua proposta para "${property.name}".`);
+    return;
+  }
+
+  if (action === "edit" && currentRole === "consultant") {
     openModal(property);
     return;
   }
 
-  if (action === "delete") {
+  if (action === "delete" && currentRole === "consultant") {
     properties = properties.filter((item) => item.id !== property.id);
     saveProperties();
     render();
@@ -766,35 +1117,348 @@ typeFilter.addEventListener("change", render);
 priceFilter.addEventListener("change", render);
 sortFilter.addEventListener("change", render);
 
-// CSV Export
-document.querySelector("#export-button").addEventListener("click", () => {
+// Analytics Period Switcher (Dia, Semana, Mês, Ano)
+document.querySelectorAll("[data-analytics-period]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    activeAnalyticsPeriod = btn.dataset.analyticsPeriod;
+    document.querySelectorAll("[data-analytics-period]").forEach((tab) => {
+      tab.classList.toggle("active", tab === btn);
+    });
+    renderConsultantDashboard();
+  });
+});
+
+// Toggle Full Analytics Table
+document.querySelector("#toggle-full-analytics-table")?.addEventListener("click", (e) => {
+  const wrap = document.querySelector("#bi-full-table-wrap");
+  if (!wrap) return;
+  wrap.hidden = !wrap.hidden;
+  e.currentTarget.textContent = wrap.hidden ? "Ver Tabela Completa ↓" : "Ocultar Tabela Completa ↑";
+});
+
+// Multi-Sheet Excel (.XLS SpreadsheetML) Generator with Visual Bar Charts
+function exportCompleteExcelWorkbook() {
   if (!properties.length) {
     showToast("Não há imóveis para exportar.");
     return;
   }
-  const columns = ["name", "type", "status", "price", "area", "beds", "baths", "parking", "address", "architect"];
-  const escapeCSV = (val) => `"${String(val ?? "").replace(/"/g, '""')}"`;
-  const csv = [
-    columns.join(";"),
-    ...properties.map((p) => columns.map((key) => escapeCSV(p[key])).join(";"))
-  ].join("\r\n");
 
-  const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" });
+  const escapeXML = (str) =>
+    String(str ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&apos;");
+
+  const makeVisualBar = (value, max, length = 20) => {
+    const filled = Math.max(1, Math.round((Number(value) / Math.max(Number(max), 1)) * length));
+    return "█".repeat(filled) + "░".repeat(Math.max(0, length - filled));
+  };
+
+  const enrichedProps = properties.map((p) => ({
+    ...p,
+    metrics: getPropertyMetrics(p.id)
+  }));
+
+  const maxViews = Math.max(...enrichedProps.map((p) => p.metrics.clientViews), 1);
+  const maxDays = Math.max(...enrichedProps.map((p) => p.metrics.daysListed), 1);
+
+  // Sheet 1 Rows: Resumo Vendas (Dia, Semana, Mês, Ano) + Gráfico de Barras
+  const periods = [
+    consultantAnalyticsData.day,
+    consultantAnalyticsData.week,
+    consultantAnalyticsData.month,
+    consultantAnalyticsData.year
+  ];
+  const maxPeriodVgv = Math.max(...periods.map((p) => p.vgvSold), 1);
+
+  const periodRowsXML = periods
+    .map(
+      (p) => `
+      <Row ss:Height="22">
+        <Cell ss:StyleID="sDataBold"><Data ss:Type="String">${escapeXML(p.label)}</Data></Cell>
+        <Cell ss:StyleID="sCurrency"><Data ss:Type="Number">${Number(p.vgvSold)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.dealsCount)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.activeViews)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.newLeads)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.visitsToday)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="String">${escapeXML(p.conversionRate)}</Data></Cell>
+        <Cell ss:StyleID="sChartBar"><Data ss:Type="String">${makeVisualBar(p.vgvSold, maxPeriodVgv, 18)} R$ ${(p.vgvSold / 1000000).toFixed(1)}M</Data></Cell>
+      </Row>`
+    )
+    .join("");
+
+  // Detailed Time-Series Rows for current selected period
+  const currentSeries = consultantAnalyticsData[activeAnalyticsPeriod] || consultantAnalyticsData.month;
+  const maxSeriesViews = Math.max(...currentSeries.series.map((s) => s.views), 1);
+  const seriesRowsXML = currentSeries.series
+    .map(
+      (s) => `
+      <Row ss:Height="20">
+        <Cell ss:StyleID="sData"><Data ss:Type="String">${escapeXML(s.period)}</Data></Cell>
+        <Cell ss:StyleID="sCurrency"><Data ss:Type="Number">${Number(s.vgv * 1000000)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(s.views)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(s.leads)}</Data></Cell>
+        <Cell ss:StyleID="sChartAmber"><Data ss:Type="String">${makeVisualBar(s.views, maxSeriesViews, 16)} (${s.views} views)</Data></Cell>
+      </Row>`
+    )
+    .join("");
+
+  // Sheet 2 Rows: Acessos por Imóvel & Tempo de Anúncio
+  const sortedByViews = [...enrichedProps].sort((a, b) => b.metrics.clientViews - a.metrics.clientViews);
+  const analyticsRowsXML = sortedByViews
+    .map(
+      (p) => `
+      <Row ss:Height="21">
+        <Cell ss:StyleID="sDataBold"><Data ss:Type="String">${escapeXML(p.name)}</Data></Cell>
+        <Cell ss:StyleID="sData"><Data ss:Type="String">${escapeXML(p.type)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="String">${escapeXML(p.status)}</Data></Cell>
+        <Cell ss:StyleID="sCurrency"><Data ss:Type="Number">${Number(p.price)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.metrics.daysListed)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="String">${escapeXML(p.metrics.listedDate)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.metrics.clientViews)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.metrics.uniqueClients)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.metrics.leadsCount)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.metrics.scheduledVisits)}</Data></Cell>
+        <Cell ss:StyleID="sChartBar"><Data ss:Type="String">${makeVisualBar(p.metrics.clientViews, maxViews, 16)} ${p.metrics.clientViews}</Data></Cell>
+        <Cell ss:StyleID="sChartAmber"><Data ss:Type="String">${makeVisualBar(p.metrics.daysListed, maxDays, 12)} ${p.metrics.daysListed}d</Data></Cell>
+      </Row>`
+    )
+    .join("");
+
+  // Sheet 3 Rows: Catálogo Completo
+  const catalogRowsXML = enrichedProps
+    .map(
+      (p) => `
+      <Row ss:Height="20">
+        <Cell ss:StyleID="sData"><Data ss:Type="String">${escapeXML(p.id)}</Data></Cell>
+        <Cell ss:StyleID="sDataBold"><Data ss:Type="String">${escapeXML(p.name)}</Data></Cell>
+        <Cell ss:StyleID="sData"><Data ss:Type="String">${escapeXML(p.type)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="String">${escapeXML(p.status)}</Data></Cell>
+        <Cell ss:StyleID="sCurrency"><Data ss:Type="Number">${Number(p.price)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.area)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.beds)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.baths)}</Data></Cell>
+        <Cell ss:StyleID="sCenter"><Data ss:Type="Number">${Number(p.parking)}</Data></Cell>
+        <Cell ss:StyleID="sData"><Data ss:Type="String">${escapeXML(p.address)}</Data></Cell>
+        <Cell ss:StyleID="sData"><Data ss:Type="String">${escapeXML(p.architect || "Curadoria Casa Clara")}</Data></Cell>
+      </Row>`
+    )
+    .join("");
+
+  const workbookXML = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <Styles>
+    <Style ss:ID="Default" ss:Name="Normal">
+      <Alignment ss:Vertical="Center"/>
+      <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#0F172A"/>
+    </Style>
+    <Style ss:ID="sTitle">
+      <Font ss:FontName="Calibri" ss:Size="15" ss:Bold="1" ss:Color="#FFFFFF"/>
+      <Interior ss:Color="#1E3A8A" ss:Pattern="Solid"/>
+      <Alignment ss:Vertical="Center" ss:Horizontal="Left"/>
+    </Style>
+    <Style ss:ID="sSubtitle">
+      <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#1E3A8A"/>
+      <Interior ss:Color="#EFF6FF" ss:Pattern="Solid"/>
+    </Style>
+    <Style ss:ID="sHeader">
+      <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/>
+      <Interior ss:Color="#0F172A" ss:Pattern="Solid"/>
+      <Alignment ss:Vertical="Center" ss:Horizontal="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#CBD5E1"/>
+      </Borders>
+    </Style>
+    <Style ss:ID="sData">
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+      </Borders>
+    </Style>
+    <Style ss:ID="sDataBold">
+      <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#0F172A"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+      </Borders>
+    </Style>
+    <Style ss:ID="sCenter">
+      <Alignment ss:Vertical="Center" ss:Horizontal="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+      </Borders>
+    </Style>
+    <Style ss:ID="sCurrency">
+      <NumberFormat ss:Format="&quot;R$&quot;\ #,##0"/>
+      <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#1E3A8A"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+      </Borders>
+    </Style>
+    <Style ss:ID="sChartBar">
+      <Font ss:FontName="Consolas" ss:Size="10" ss:Bold="1" ss:Color="#1E3A8A"/>
+      <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+      </Borders>
+    </Style>
+    <Style ss:ID="sChartAmber">
+      <Font ss:FontName="Consolas" ss:Size="10" ss:Bold="1" ss:Color="#D97706"/>
+      <Interior ss:Color="#FFFBEB" ss:Pattern="Solid"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+      </Borders>
+    </Style>
+  </Styles>
+
+  <!-- ABA 1: RESUMO EXECUTIVO & GRÁFICOS DE VENDAS -->
+  <Worksheet ss:Name="1. Vendas e Gráficos">
+    <Table>
+      <Column ss:Width="170"/>
+      <Column ss:Width="135"/>
+      <Column ss:Width="110"/>
+      <Column ss:Width="120"/>
+      <Column ss:Width="115"/>
+      <Column ss:Width="115"/>
+      <Column ss:Width="110"/>
+      <Column ss:Width="260"/>
+      <Row ss:Height="30">
+        <Cell ss:MergeAcross="7" ss:StyleID="sTitle">
+          <Data ss:Type="String">CASA CLARA PRIVATE REALTY — RELATÓRIO GERENCIAL DE VENDAS (DIA, SEMANA, MÊS E ANO)</Data>
+        </Cell>
+      </Row>
+      <Row ss:Height="24">
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Período Analisado</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">VGV Fechado (R$)</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Imóveis Vendidos</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Acessos Clientes</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Novos Leads</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Visitas Realizadas</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Conversão</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Gráfico Comparativo de VGV</Data></Cell>
+      </Row>
+      ${periodRowsXML}
+      <Row ss:Height="18"/>
+      <Row ss:Height="24">
+        <Cell ss:MergeAcross="4" ss:StyleID="sSubtitle">
+          <Data ss:Type="String">DETALHAMENTO E GRÁFICO DE TRÁFEGO — ${escapeXML(currentSeries.seriesTitle.toUpperCase())}</Data>
+        </Cell>
+      </Row>
+      <Row ss:Height="22">
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Faixa / Período</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">VGV Fechado (R$)</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Acessos Clientes</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Propostas / Leads</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Gráfico de Acessos por Período</Data></Cell>
+      </Row>
+      ${seriesRowsXML}
+    </Table>
+  </Worksheet>
+
+  <!-- ABA 2: TEMPO DE ANÚNCIO & ACESSOS POR IMÓVEL -->
+  <Worksheet ss:Name="2. Acessos e Tempo Anúncio">
+    <Table>
+      <Column ss:Width="230"/>
+      <Column ss:Width="105"/>
+      <Column ss:Width="95"/>
+      <Column ss:Width="130"/>
+      <Column ss:Width="115"/>
+      <Column ss:Width="105"/>
+      <Column ss:Width="115"/>
+      <Column ss:Width="115"/>
+      <Column ss:Width="100"/>
+      <Column ss:Width="105"/>
+      <Column ss:Width="235"/>
+      <Column ss:Width="195"/>
+      <Row ss:Height="30">
+        <Cell ss:MergeAcross="11" ss:StyleID="sTitle">
+          <Data ss:Type="String">AUDITORIA DE TRÁFEGO DE CLIENTES E TEMPO DE ANÚNCIO POR IMÓVEL</Data>
+        </Cell>
+      </Row>
+      <Row ss:Height="24">
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Imóvel</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Tipologia</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Status</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Valor (R$)</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Dias Anunciado</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Data Cadastro</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Acessos Totais</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Clientes Únicos</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Propostas</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Visitas Agend.</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Gráfico de Acessos Clientes</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Gráfico Tempo de Anúncio</Data></Cell>
+      </Row>
+      ${analyticsRowsXML}
+    </Table>
+  </Worksheet>
+
+  <!-- ABA 3: CATÁLOGO TÉCNICO COMPLETO -->
+  <Worksheet ss:Name="3. Catálogo de Imóveis">
+    <Table>
+      <Column ss:Width="75"/>
+      <Column ss:Width="230"/>
+      <Column ss:Width="105"/>
+      <Column ss:Width="95"/>
+      <Column ss:Width="135"/>
+      <Column ss:Width="90"/>
+      <Column ss:Width="80"/>
+      <Column ss:Width="85"/>
+      <Column ss:Width="80"/>
+      <Column ss:Width="250"/>
+      <Column ss:Width="175"/>
+      <Row ss:Height="30">
+        <Cell ss:MergeAcross="10" ss:StyleID="sTitle">
+          <Data ss:Type="String">ACERVO COMPLETO DE PROPRIEDADES — CASA CLARA PRIVATE REALTY</Data>
+        </Cell>
+      </Row>
+      <Row ss:Height="24">
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Código</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Propriedade</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Tipologia</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Status</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Preço (R$)</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Área (m²)</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Quartos</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Banheiros</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Vagas</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Endereço</Data></Cell>
+        <Cell ss:StyleID="sHeader"><Data ss:Type="String">Arquiteto</Data></Cell>
+      </Row>
+      ${catalogRowsXML}
+    </Table>
+  </Worksheet>
+</Workbook>`;
+
+  const blob = new Blob(["\ufeff", workbookXML], {
+    type: "application/vnd.ms-excel;charset=utf-8"
+  });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "colecao-casa-clara-private-realty.csv";
+  link.download = `relatorio-gerencial-casa-clara-${activeAnalyticsPeriod}.xls`;
   link.click();
   URL.revokeObjectURL(url);
-  showToast("Relatório CSV exportado com sucesso.");
-});
+  showToast("Planilha Excel (.XLS) exportada com 3 abas e gráficos prontos!");
+}
+
+document.querySelector("#export-button")?.addEventListener("click", exportCompleteExcelWorkbook);
+document.querySelector("#export-excel-report")?.addEventListener("click", exportCompleteExcelWorkbook);
+document.querySelector("#export-excel-table-btn")?.addEventListener("click", exportCompleteExcelWorkbook);
 
 // Concierge Lead Form
 document.querySelector("#concierge-form")?.addEventListener("submit", (e) => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(e.target).entries());
+  const propNote = data.selectedProperty ? ` referente a "${data.selectedProperty}"` : "";
   e.target.reset();
-  showToast(`Solicitação recebida, ${data.clientName}. Nosso Private Desk entrará em contato.`);
+  const banner = document.querySelector("#selected-property-banner");
+  if (banner) banner.hidden = true;
+  showToast(`Solicitação (${data.clientInterest})${propNote} enviada! Nosso consultor entrará em contato, ${data.clientName}.`);
 });
 
 // Mobile Navigation Toggle
