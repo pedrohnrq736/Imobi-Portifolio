@@ -1,0 +1,106 @@
+/* Design System — Portal Imobiliário High-End (Casa Clara Private Realty)
+   Paleta: Fundo #F8FAFC | Grafite #0F172A | Azul Marinho #1E3A8A | Dourado/Âmbar #D97706
+   Tipografia: 'Plus Jakarta Sans' (Títulos) e 'Inter' (Textos)
+*/
+
+:root {
+  --bg-surface: #F8FAFC;
+  --text-graphite: #0F172A;
+  --primary-navy: #1E3A8A;
+  --accent-amber: #D97706;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  background-color: var(--bg-surface);
+  color: var(--text-graphite);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+/* Filter Tabs */
+.filter-tab {
+  color: #475569;
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+}
+
+.filter-tab span {
+  background-color: #F1F5F9;
+  color: #475569;
+}
+
+.filter-tab:hover {
+  border-color: #CBD5E1;
+  color: var(--primary-navy);
+}
+
+.filter-tab.active {
+  background-color: var(--primary-navy);
+  color: #FFFFFF;
+  border-color: var(--primary-navy);
+  box-shadow: 0 4px 14px rgba(30, 58, 138, 0.22);
+}
+
+.filter-tab.active span {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+
+/* Property Card Hover & Image Transitions */
+.property-card {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.property-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.12);
+}
+
+.property-card .card-image {
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.property-card:hover .card-image {
+  transform: scale(1.05);
+}
+
+/* Custom Scrollbar Hiding for Horizontal Pill Bars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Toast Animation */
+.toast {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

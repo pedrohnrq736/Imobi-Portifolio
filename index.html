@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="pt-BR" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#F8FAFC" />
+    <meta
+      name="description"
+      content="Casa Clara Private Realty — Portal Imobiliário High-End. Curadoria de residências assinadas, coberturas e propriedades exclusivas."
+    />
+    <title>Casa Clara Private Realty — Portal Imobiliário High-End</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans (Títulos) & Inter (Textos) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              surface: "#F8FAFC",
+              graphite: "#0F172A",
+              navy: {
+                DEFAULT: "#1E3A8A",
+                dark: "#172554",
+                light: "#EFF6FF",
+                muted: "#3B82F6"
+              },
+              amber: {
+                DEFAULT: "#D97706",
+                light: "#FEF3C7",
+                dark: "#B45309"
+              }
+            },
+            fontFamily: {
+              heading: ['"Plus Jakarta Sans"', "sans-serif"],
+              sans: ['"Inter"', "sans-serif"]
+            },
+            boxShadow: {
+              glass: "0 12px 36px -8px rgba(15, 23, 42, 0.08)",
+              card: "0 4px 20px -2px rgba(15, 23, 42, 0.05)",
+              elevated: "0 20px 50px -12px rgba(30, 58, 138, 0.14)"
+            }
+          }
+        }
+      };
+    </script>
+
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body class="bg-surface text-graphite font-sans antialiased selection:bg-navy selection:text-white min-h-screen flex flex-col">
+    <!-- Top Announcement Bar -->
+    <div class="bg-graphite text-slate-200 text-xs border-b border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-9 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-2 h-2 rounded-full bg-amber animate-pulse"></span>
+          <span class="font-medium tracking-wide uppercase text-[10px] text-amber">Private Collection 2025</span>
+          <span class="hidden sm:inline text-slate-400">— Curadoria de arquitetura autoral e propriedades off-market</span>
+        </div>
+        <div class="flex items-center gap-4 text-[11px] text-slate-300">
+          <span id="today-label" class="hidden md:inline text-slate-400"></span>
+          <a href="#concierge" class="hover:text-amber transition-colors font-medium">Atendimento Private ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky Glass Header -->
+    <header class="sticky top-0 z-40 bg-white/85 backdrop-blur-xl border-b border-slate-200/80 transition-all">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+        <!-- Brand Logo -->
+        <a href="#" class="flex items-center gap-3 group focus:outline-none" aria-label="Casa Clara Private Realty">
+          <div class="w-10 h-10 rounded-xl bg-navy text-white flex items-center justify-center shadow-md shadow-navy/20 group-hover:bg-navy-dark transition-colors">
+            <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 15.2 16 5l12 10.2v12.3H4V15.2Z" />
+              <path d="M12 27.5v-9h8v9M2.5 15.5 16 4l13.5 11.5" />
+            </svg>
+          </div>
+          <div>
+            <span class="font-heading font-extrabold text-xl tracking-tight text-graphite block leading-none">
+              CASA<span class="text-navy">CLARA</span>
+            </span>
+            <span class="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber block mt-1">
+              Private Realty
+            </span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-600" aria-label="Menu Principal">
+          <a href="#colecao" class="hover:text-navy transition-colors py-1">Coleção Exclusiva</a>
+          <a href="#destaques" data-quick-filter="featured" class="hover:text-navy transition-colors py-1 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber"></span> Assinados
+          </a>
+          <a href="#curadoria" class="hover:text-navy transition-colors py-1">Diferenciais</a>
+          <a href="#simulador" class="hover:text-navy transition-colors py-1">Simulador Patrimonial</a>
+          <a href="#concierge" class="hover:text-navy transition-colors py-1">Private Desk</a>
+        </nav>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-2.5 sm:gap-3">
+          <!-- Favorites Filter Button -->
+          <button
+            id="favorites-toggle"
+            type="button"
+            class="relative inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-white hover:border-navy/30 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all"
+            title="Ver imóveis salvos nos favoritos"
+            aria-pressed="false"
+          >
+            <svg class="w-4 h-4 text-amber transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+            <span class="hidden sm:inline">Favoritos</span>
+            <span id="fav-count" class="px-1.5 py-0.5 text-[10px] rounded-full bg-amber/15 text-amber-dark font-bold">0</span>
+          </button>
+
+          <!-- Add Property CTA -->
+          <button
+            id="add-property"
+            type="button"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-navy hover:bg-navy-dark text-white text-xs sm:text-sm font-semibold shadow-sm shadow-navy/20 transition-all hover:-translate-y-0.5"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span>Anunciar Imóvel</span>
+          </button>
+
+          <!-- Mobile Hamburger -->
+          <button
+            id="mobile-menu-btn"
+            type="button"
+            class="lg:hidden p-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100"
+            aria-label="Abrir menu de navegação"
+            aria-expanded="false"
+          >
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Navigation Drawer -->
+      <div id="mobile-drawer" class="lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-5 space-y-2" hidden>
+        <a href="#colecao" class="block px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50">Coleção Exclusiva</a>
+        <a href="#destaques" data-quick-filter="featured" class="block px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50">Imóveis Assinados</a>
+        <a href="#curadoria" class="block px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50">Diferenciais & Arquitetura</a>
+        <a href="#simulador" class="block px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50">Simulador Patrimonial</a>
+        <a href="#concierge" class="block px-3 py-2.5 rounded-xl text-sm font-medium text-navy font-semibold bg-navy/5">Agendar Private Desk</a>
+      </div>
+    </header>
+
+    <main class="flex-1">
+      <!-- HERO SECTION -->
+      <section class="relative overflow-hidden pt-8 pb-14 lg:pt-12 lg:pb-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="relative rounded-3xl overflow-hidden bg-graphite shadow-2xl border border-slate-800/40">
+            <!-- Hero Background Image -->
+            <img
+              src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2000&q=85"
+              alt="Mansão contemporânea iluminada ao entardecer"
+              class="absolute inset-0 w-full h-full object-cover object-center opacity-50 scale-105 transition-transform duration-1000"
+            />
+            <div class="absolute inset-0 bg-gradient-to-r from-graphite via-graphite/80 to-graphite/30"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-graphite via-transparent to-transparent"></div>
+
+            <!-- Hero Content -->
+            <div class="relative z-10 px-6 py-12 sm:px-10 sm:py-16 lg:px-16 lg:py-20 max-w-4xl">
+              <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-amber-light text-xs font-semibold tracking-wider uppercase mb-6">
+                <span class="w-2 h-2 rounded-full bg-amber"></span>
+                Arquitetura Autoral &amp; Patrimônio
+              </div>
+
+              <h1 class="font-heading font-extrabold text-3xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-[1.12] mb-6">
+                Imóveis extraordinários para quem vive a <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-light via-amber to-amber-light">arte de morar</span>.
+              </h1>
+
+              <p class="text-slate-200 text-base sm:text-lg max-w-2xl leading-relaxed mb-8 font-normal">
+                Acesse uma coleção criteriosa de coberturas, mansões contemporâneas e residências assinadas pelos maiores arquitetos do Brasil nos endereços mais desejados.
+              </p>
+
+              <!-- Quick Hero Search Pill (Airbnb / Apple style) -->
+              <div class="bg-white/95 backdrop-blur-xl p-2 sm:p-3 rounded-2xl shadow-2xl border border-white/50 max-w-3xl">
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-3 items-center">
+                  <!-- Search Input -->
+                  <div class="sm:col-span-5 flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-slate-50/90 border border-slate-200/70 focus-within:border-navy focus-within:bg-white transition-all">
+                    <svg class="w-5 h-5 text-navy shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="7" />
+                      <path stroke-linecap="round" d="m20 20-3.5-3.5" />
+                    </svg>
+                    <div class="w-full">
+                      <label for="search-input" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Localização ou Arquiteto</label>
+                      <input
+                        id="search-input"
+                        type="search"
+                        placeholder="Jardim Europa, Leblon, MK27..."
+                        class="w-full bg-transparent text-xs sm:text-sm font-medium text-graphite placeholder:text-slate-400 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Property Type Select -->
+                  <div class="sm:col-span-4 flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-slate-50/90 border border-slate-200/70 focus-within:border-navy focus-within:bg-white transition-all">
+                    <svg class="w-5 h-5 text-amber shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m3 10 9-7 9 7v11H3V10Z" />
+                    </svg>
+                    <div class="w-full">
+                      <label for="type-filter" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Tipologia</label>
+                      <select
+                        id="type-filter"
+                        class="w-full bg-transparent text-xs sm:text-sm font-medium text-graphite focus:outline-none cursor-pointer"
+                      >
+                        <option value="all">Todas as tipologias</option>
+                        <option value="Cobertura">Coberturas &amp; Penthouses</option>
+                        <option value="Mansão">Mansões &amp; Fazendas</option>
+                        <option value="Apartamento">Apartamentos High-End</option>
+                        <option value="Casa">Casas Contemporâneas</option>
+                        <option value="Comercial">Corporate Boutique</option>
+                        <option value="Terreno">Terrenos Exclusivos</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- CTA Explore -->
+                  <div class="sm:col-span-3">
+                    <a
+                      href="#colecao"
+                      class="w-full h-full min-h-[48px] inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-navy hover:bg-navy-dark text-white font-semibold text-sm shadow-lg shadow-navy/25 transition-all"
+                    >
+                      <span>Explorar</span>
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Tags -->
+              <div class="mt-6 flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                <span class="text-slate-400 font-medium">Buscas em alta:</span>
+                <button type="button" data-search-tag="Jardim Europa" class="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm transition-colors">Jardim Europa</button>
+                <button type="button" data-search-tag="Fazenda Boa Vista" class="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm transition-colors">Fazenda Boa Vista</button>
+                <button type="button" data-search-tag="Leblon" class="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm transition-colors">Leblon Frontal Mar</button>
+                <button type="button" data-search-tag="Itaim Bibi" class="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm transition-colors">Itaim Bibi</button>
+                <button type="button" data-search-tag="Arthur Casas" class="px-3 py-1 rounded-full bg-amber/20 border border-amber/40 hover:bg-amber/30 text-amber-light backdrop-blur-sm transition-colors">Assinados</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI Portfolio Bar -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-6" aria-label="Indicadores do Portfólio">
+            <article class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-card flex items-start justify-between">
+              <div>
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Acervo Curado</span>
+                <div class="font-heading font-extrabold text-2xl sm:text-3xl text-graphite mt-1" id="stat-total">0</div>
+                <p class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-navy"></span> Propriedades verificadas
+                </p>
+              </div>
+              <span class="w-10 h-10 rounded-xl bg-navy/10 text-navy flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m3 10 9-7 9 7v11H3V10Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 21v-7h6v7" />
+                </svg>
+              </span>
+            </article>
+
+            <article class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-card flex items-start justify-between">
+              <div>
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Disponíveis Agora</span>
+                <div class="font-heading font-extrabold text-2xl sm:text-3xl text-navy mt-1" id="stat-available">0</div>
+                <p class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Visitas privativas abertas
+                </p>
+              </div>
+              <span class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="12" cy="12" r="9" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m8.5 12.5 2.5 2.5 5-5.5" />
+                </svg>
+              </span>
+            </article>
+
+            <article class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-card flex items-start justify-between">
+              <div>
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Negócios Fechados</span>
+                <div class="font-heading font-extrabold text-2xl sm:text-3xl text-graphite mt-1" id="stat-completed">0</div>
+                <p class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-amber"></span> Vendidos ou locados
+                </p>
+              </div>
+              <span class="w-10 h-10 rounded-xl bg-amber/10 text-amber flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 18.5 9 13l3 2.5 7-8" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 7.5h5v5" />
+                </svg>
+              </span>
+            </article>
+
+            <article class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-card flex items-start justify-between">
+              <div>
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">VGV sob Gestão</span>
+                <div class="font-heading font-extrabold text-xl sm:text-2xl text-graphite mt-1" id="stat-value">R$ 0</div>
+                <p class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-navy"></span> Valor patrimonial ativo
+                </p>
+              </div>
+              <span class="w-10 h-10 rounded-xl bg-navy/10 text-navy flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m5-14.5c0-1.4-1.8-2.5-5-2.5S7 5.1 7 6.5 8.8 9 12 9s5 1.1 5 2.5S15.2 14 12 14s-5 1.1-5 2.5S8.8 19 12 19s5-1.1 5-2.5" />
+                </svg>
+              </span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- MAIN CATALOG SECTION -->
+      <section id="colecao" class="py-8 sm:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Catalog Header -->
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-slate-200">
+            <div>
+              <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-amber mb-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber"></span>
+                Portfólio High-End
+              </div>
+              <h2 class="font-heading font-extrabold text-2xl sm:text-3xl text-graphite tracking-tight flex items-center gap-3">
+                Coleção de Propriedades
+                <span id="heading-count" class="px-2.5 py-1 text-xs font-bold rounded-full bg-navy/10 text-navy">0</span>
+              </h2>
+              <p class="text-sm text-slate-500 mt-1">
+                Filtre por status, modalidade, faixa de valor ou explore o dossiê completo de cada imóvel.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5">
+              <!-- Reset Mock Data Button -->
+              <button
+                id="reset-catalog"
+                type="button"
+                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-semibold transition-colors"
+                title="Restaurar os 14 imóveis originais da curadoria"
+              >
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+                <span>Restaurar Acervo</span>
+              </button>
+
+              <!-- Export CSV -->
+              <button
+                id="export-button"
+                type="button"
+                class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:border-navy/40 hover:text-navy text-slate-700 text-xs font-semibold transition-all"
+                title="Baixar relatório em CSV"
+              >
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4" />
+                </svg>
+                <span>Exportar CSV</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Advanced Filters Toolbar -->
+          <div class="py-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200/80">
+            <!-- Status Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0 no-scrollbar" role="tablist" aria-label="Filtrar por disponibilidade">
+              <button
+                class="filter-tab active px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 shrink-0"
+                type="button"
+                data-status="all"
+                role="tab"
+                aria-selected="true"
+              >
+                Todos <span id="tab-all" class="px-1.5 py-0.5 rounded-md text-[10px]">0</span>
+              </button>
+              <button
+                class="filter-tab px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 shrink-0"
+                type="button"
+                data-status="Disponível"
+                role="tab"
+                aria-selected="false"
+              >
+                Disponíveis <span id="tab-available" class="px-1.5 py-0.5 rounded-md text-[10px]">0</span>
+              </button>
+              <button
+                class="filter-tab px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 shrink-0"
+                type="button"
+                data-status="Alugado"
+                role="tab"
+                aria-selected="false"
+              >
+                Locação / Alugados <span id="tab-rented" class="px-1.5 py-0.5 rounded-md text-[10px]">0</span>
+              </button>
+              <button
+                class="filter-tab px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 shrink-0"
+                type="button"
+                data-status="Vendido"
+                role="tab"
+                aria-selected="false"
+              >
+                Vendidos <span id="tab-sold" class="px-1.5 py-0.5 rounded-md text-[10px]">0</span>
+              </button>
+            </div>
+
+            <!-- Secondary Controls: Price Range, Sort & View -->
+            <div class="flex flex-wrap items-center gap-2.5">
+              <!-- Price Filter -->
+              <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-600">
+                <span class="font-semibold text-slate-400">Faixa:</span>
+                <select id="price-filter" class="bg-transparent font-semibold text-graphite focus:outline-none cursor-pointer">
+                  <option value="all">Qualquer valor</option>
+                  <option value="up-to-10m">Até R$ 10 milhões</option>
+                  <option value="10m-to-20m">R$ 10 mi a R$ 20 milhões</option>
+                  <option value="above-20m">Acima de R$ 20 milhões</option>
+                  <option value="rental">Locação Mensal</option>
+                </select>
+              </label>
+
+              <!-- Sort Control -->
+              <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-600">
+                <span class="font-semibold text-slate-400">Ordenar:</span>
+                <select id="sort-filter" class="bg-transparent font-semibold text-graphite focus:outline-none cursor-pointer">
+                  <option value="featured">Destaques da Curadoria</option>
+                  <option value="price-desc">Maior Valor</option>
+                  <option value="price-asc">Menor Valor</option>
+                  <option value="area-desc">Maior Área (m²)</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <!-- Active Filter Pill Bar -->
+          <div id="active-filters-bar" class="pt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+            <span id="results-label" class="font-medium">Carregando coleção...</span>
+            <button
+              id="clear-filters"
+              type="button"
+              class="text-navy hover:text-amber font-semibold underline underline-offset-4 hidden"
+            >
+              Limpar todos os filtros
+            </button>
+          </div>
+
+          <!-- PROPERTY GRID -->
+          <div
+            id="property-grid"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 py-6"
+            aria-live="polite"
+          ></div>
+
+          <!-- EMPTY STATE -->
+          <div
+            id="empty-state"
+            class="my-8 bg-white rounded-3xl border border-slate-200/90 p-12 text-center max-w-lg mx-auto shadow-card"
+            hidden
+          >
+            <div class="w-16 h-16 rounded-2xl bg-navy/10 text-navy flex items-center justify-center mx-auto mb-5">
+              <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m3 10 9-7 9 7v11H3V10Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 21v-7h6v7" />
+              </svg>
+            </div>
+            <h3 id="empty-title" class="font-heading font-bold text-xl text-graphite mb-2">
+              Nenhum imóvel encontrado
+            </h3>
+            <p id="empty-description" class="text-sm text-slate-500 mb-6 leading-relaxed">
+              Não encontramos propriedades com os critérios selecionados. Experimente limpar os filtros ou cadastrar um novo imóvel.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-3">
+              <button
+                id="empty-reset-filters"
+                type="button"
+                class="px-5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all"
+              >
+                Limpar Filtros
+              </button>
+              <button
+                id="empty-add"
+                type="button"
+                class="px-5 py-2.5 rounded-xl bg-navy hover:bg-navy-dark text-white text-xs font-semibold transition-all"
+              >
+                Cadastrar Novo Imóvel
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ARCHITECTURAL CURATION & DIFFERENTIALS SECTION -->
+      <section id="curadoria" class="py-16 bg-white border-y border-slate-200/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="max-w-3xl">
+            <span class="text-xs font-bold uppercase tracking-widest text-amber block mb-2">Excelência &amp; Discrição</span>
+            <h2 class="font-heading font-extrabold text-3xl sm:text-4xl text-graphite tracking-tight">
+              Por que colecionadores e famílias escolhem a Casa Clara
+            </h2>
+            <p class="text-slate-600 mt-3 text-base leading-relaxed">
+              Combinamos inteligência de mercado, curadoria arquitetônica rigorosa e assessoria jurídica patrimonial para transações imobiliárias de alta complexidade.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-10">
+            <div class="p-7 rounded-2xl bg-surface border border-slate-200/70 hover:border-navy/30 transition-all">
+              <div class="w-12 h-12 rounded-2xl bg-navy text-white flex items-center justify-center mb-5 shadow-md shadow-navy/15">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
+                </svg>
+              </div>
+              <h3 class="font-heading font-bold text-lg text-graphite mb-2">Curadoria Arquitetônica</h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Selecionamos apenas obras assinadas ou residências com qualidade construtiva singular, insolação privilegiada e plantas atemporais.
+              </p>
+            </div>
+
+            <div class="p-7 rounded-2xl bg-surface border border-slate-200/70 hover:border-navy/30 transition-all">
+              <div class="w-12 h-12 rounded-2xl bg-amber text-white flex items-center justify-center mb-5 shadow-md shadow-amber/20">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                </svg>
+              </div>
+              <h3 class="font-heading font-bold text-lg text-graphite mb-2">Compliance &amp; Sigilo Absoluto</h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Due diligence jurídica completa, blindagem documental e negociações sob acordo de confidencialidade (NDA) para proteção das partes.
+              </p>
+            </div>
+
+            <div class="p-7 rounded-2xl bg-surface border border-slate-200/70 hover:border-navy/30 transition-all">
+              <div class="w-12 h-12 rounded-2xl bg-graphite text-white flex items-center justify-center mb-5 shadow-md">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+                </svg>
+              </div>
+              <h3 class="font-heading font-bold text-lg text-graphite mb-2">Inteligência Patrimonial</h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Avaliação técnica baseada em transações reais por metro quadrado, liquidez histórica e potencial de valorização em cada micro-região.
+              </p>
+            </div>
+          </div>
+
+          <!-- Testimonials Grid -->
+          <div id="testimonials-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 pt-12 border-t border-slate-200/70"></div>
+        </div>
+      </section>
+
+      <!-- WEALTH / FINANCING SIMULATOR & PRIVATE CONCIERGE -->
+      <section id="simulador" class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            <!-- Simulator Card -->
+            <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-card flex flex-col justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-navy block mb-2">Planejamento Financeiro</span>
+                <h2 class="font-heading font-extrabold text-2xl sm:text-3xl text-graphite tracking-tight">
+                  Simulador de Estruturação Patrimonial
+                </h2>
+                <p class="text-sm text-slate-500 mt-1 mb-8">
+                  Calcule cenários de aquisição com linhas de crédito Prime ou Home Equity com taxas referenciais de mercado.
+                </p>
+
+                <div class="space-y-6">
+                  <div>
+                    <div class="flex justify-between text-xs font-semibold mb-2">
+                      <label for="sim-price" class="text-slate-600">Valor da Propriedade</label>
+                      <span id="sim-price-display" class="text-navy font-bold text-sm">R$ 12.000.000</span>
+                    </div>
+                    <input
+                      id="sim-price"
+                      type="range"
+                      min="1500000"
+                      max="35000000"
+                      step="250000"
+                      value="12000000"
+                      class="w-full accent-navy cursor-pointer"
+                    />
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                      <div class="flex justify-between text-xs font-semibold mb-2">
+                        <label for="sim-down" class="text-slate-600">Entrada (%)</label>
+                        <span id="sim-down-display" class="text-graphite font-bold">40%</span>
+                      </div>
+                      <input
+                        id="sim-down"
+                        type="range"
+                        min="20"
+                        max="80"
+                        step="5"
+                        value="40"
+                        class="w-full accent-amber cursor-pointer"
+                      />
+                    </div>
+
+                    <div>
+                      <div class="flex justify-between text-xs font-semibold mb-2">
+                        <label for="sim-years" class="text-slate-600">Prazo (Anos)</label>
+                        <span id="sim-years-display" class="text-graphite font-bold">20 anos</span>
+                      </div>
+                      <input
+                        id="sim-years"
+                        type="range"
+                        min="5"
+                        max="35"
+                        step="5"
+                        value="20"
+                        class="w-full accent-navy cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Simulator Output Box -->
+              <div class="mt-8 p-6 rounded-2xl bg-surface border border-slate-200/80 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block">Aporte Inicial</span>
+                  <strong id="sim-result-down" class="font-heading font-extrabold text-lg text-graphite mt-1 block">R$ 4.800.000</strong>
+                </div>
+                <div>
+                  <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block">Valor Financiado</span>
+                  <strong id="sim-result-loan" class="font-heading font-extrabold text-lg text-navy mt-1 block">R$ 7.200.000</strong>
+                </div>
+                <div>
+                  <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block">Parcela Estimada (SAC)</span>
+                  <strong id="sim-result-monthly" class="font-heading font-extrabold text-lg text-amber-dark mt-1 block">R$ 68.400/mês</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Private Concierge Card -->
+            <div id="concierge" class="lg:col-span-5 bg-navy text-white rounded-3xl p-6 sm:p-10 shadow-elevated relative overflow-hidden flex flex-col justify-between">
+              <div class="relative z-10">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-amber-light text-[11px] font-bold uppercase tracking-wider mb-4">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber"></span>
+                  Private Desk
+                </span>
+                <h2 class="font-heading font-extrabold text-2xl sm:text-3xl tracking-tight leading-snug">
+                  Agende uma consultoria ou visita privativa
+                </h2>
+                <p class="text-blue-100/85 text-sm mt-2 leading-relaxed">
+                  Nossos sócios-consultores atendem com hora marcada em nossos lounges no Jardim Europa e Leblon, ou via videoconferência exclusiva.
+                </p>
+
+                <form id="concierge-form" class="mt-6 space-y-3.5">
+                  <div>
+                    <label class="block text-xs font-semibold text-blue-100 mb-1">Nome completo</label>
+                    <input
+                      type="text"
+                      name="clientName"
+                      required
+                      placeholder="Ex.: Roberto Albuquerque"
+                      class="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-blue-200/50 text-sm focus:outline-none focus:border-amber"
+                    />
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-xs font-semibold text-blue-100 mb-1">Telefone / WhatsApp</label>
+                      <input
+                        type="tel"
+                        name="clientPhone"
+                        required
+                        placeholder="(11) 99999-0000"
+                        class="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-blue-200/50 text-sm focus:outline-none focus:border-amber"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-semibold text-blue-100 mb-1">Interesse Principal</label>
+                      <select
+                        name="clientInterest"
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-navy-dark border border-white/20 text-white text-sm focus:outline-none focus:border-amber"
+                      >
+                        <option value="Aquisição Residencial">Aquisição Residencial</option>
+                        <option value="Investimento / Renda">Investimento / Renda</option>
+                        <option value="Avaliação para Venda">Avaliar meu Imóvel</option>
+                        <option value="Acervo Off-Market">Acervo Off-Market</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    class="w-full mt-2 py-3 px-5 rounded-xl bg-amber hover:bg-amber-dark text-white font-semibold text-sm shadow-lg shadow-amber/25 transition-all"
+                  >
+                    Solicitar Contato Confidencial
+                  </button>
+                </form>
+              </div>
+
+              <div class="relative z-10 mt-6 pt-5 border-t border-white/15 flex items-center justify-between text-xs text-blue-100/80">
+                <span>CRECI-SP 38.940-J</span>
+                <span>São Paulo · Rio · Lisboa · Miami</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-graphite text-slate-400 border-t border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-slate-800">
+          <div class="md:col-span-2">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-9 h-9 rounded-xl bg-navy text-white flex items-center justify-center">
+                <svg class="w-5 h-5" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 15.2 16 5l12 10.2v12.3H4V15.2Z" />
+                </svg>
+              </div>
+              <span class="font-heading font-extrabold text-lg text-white tracking-tight">
+                CASA<span class="text-amber">CLARA</span> <small class="text-xs font-normal text-slate-400">Private Realty</small>
+              </span>
+            </div>
+            <p class="text-sm text-slate-400 max-w-md leading-relaxed">
+              Boutique imobiliária especializada em residências assinadas, coberturas e propriedades singulares nos endereços mais valorizados do Brasil.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="font-heading font-bold text-white text-sm mb-3">Endereços Principais</h3>
+            <ul class="space-y-2 text-xs">
+              <li>Av. Europa, 840 — Jardim Europa, São Paulo</li>
+              <li>Av. Delfim Moreira, 420 — Leblon, Rio de Janeiro</li>
+              <li>Fazenda Boa Vista — Porto Feliz, SP</li>
+              <li>Jurerê Internacional — Florianópolis, SC</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="font-heading font-bold text-white text-sm mb-3">Canais Diretos</h3>
+            <ul class="space-y-2 text-xs">
+              <li>Private Desk: +55 (11) 3088-9400</li>
+              <li>concierge@casaclara.com.br</li>
+              <li>imprensa@casaclara.com.br</li>
+              <li class="text-amber font-medium pt-1">Atendimento 7 dias sob agendamento</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <span>© 2025 Casa Clara Private Realty. Todos os direitos reservados.</span>
+          <div class="flex items-center gap-5">
+            <a href="#colecao" class="hover:text-white transition-colors">Portfólio</a>
+            <a href="#curadoria" class="hover:text-white transition-colors">Governança</a>
+            <a href="#simulador" class="hover:text-white transition-colors">Simulador</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- PROPERTY DETAILS DRAWER / MODAL (Quick View Dossier) -->
+    <div
+      id="detail-modal"
+      class="fixed inset-0 z-50 bg-graphite/75 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto flex items-center justify-center"
+      hidden
+    >
+      <article
+        class="bg-white w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl border border-slate-200 my-auto max-h-[92vh] flex flex-col"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detail-title"
+      >
+        <!-- Image Header -->
+        <div class="relative h-64 sm:h-80 bg-slate-900 shrink-0">
+          <img id="detail-image" src="" alt="" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-t from-graphite/90 via-graphite/25 to-transparent"></div>
+
+          <button
+            id="detail-close"
+            type="button"
+            class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-graphite flex items-center justify-center font-bold text-xl shadow-lg transition-transform hover:scale-105"
+            aria-label="Fechar detalhes do imóvel"
+          >
+            ×
+          </button>
+
+          <div class="absolute top-4 left-4 flex items-center gap-2">
+            <span id="detail-badge-status" class="px-3 py-1 rounded-full text-xs font-bold bg-white text-graphite shadow"></span>
+            <span id="detail-badge-type" class="px-3 py-1 rounded-full text-xs font-semibold bg-navy text-white shadow"></span>
+          </div>
+
+          <div class="absolute bottom-4 left-6 right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-2 text-white">
+            <div>
+              <p id="detail-architect" class="text-xs font-semibold uppercase tracking-widest text-amber-light"></p>
+              <h2 id="detail-title" class="font-heading font-extrabold text-2xl sm:text-3xl leading-tight"></h2>
+              <p id="detail-address" class="text-xs sm:text-sm text-slate-200 mt-0.5"></p>
+            </div>
+            <div class="sm:text-right">
+              <div id="detail-price" class="font-heading font-extrabold text-2xl sm:text-3xl text-amber-light"></div>
+              <div id="detail-condo" class="text-[11px] text-slate-300"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body Content -->
+        <div class="p-6 sm:p-8 overflow-y-auto space-y-6">
+          <!-- Specs Bar -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl bg-surface border border-slate-200/80 text-center">
+            <div>
+              <span class="text-[11px] text-slate-400 font-semibold uppercase block">Área Privativa</span>
+              <strong id="detail-area" class="font-heading font-bold text-base text-graphite"></strong>
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-400 font-semibold uppercase block">Dormitórios / Suítes</span>
+              <strong id="detail-beds" class="font-heading font-bold text-base text-graphite"></strong>
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-400 font-semibold uppercase block">Banheiros</span>
+              <strong id="detail-baths" class="font-heading font-bold text-base text-graphite"></strong>
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-400 font-semibold uppercase block">Vagas</span>
+              <strong id="detail-parking" class="font-heading font-bold text-base text-graphite"></strong>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <h3 class="font-heading font-bold text-sm uppercase tracking-wider text-slate-400 mb-2">Memorial Descritivo</h3>
+            <p id="detail-description" class="text-slate-700 text-sm sm:text-base leading-relaxed"></p>
+          </div>
+
+          <!-- Amenities -->
+          <div>
+            <h3 class="font-heading font-bold text-sm uppercase tracking-wider text-slate-400 mb-3">Diferenciais &amp; Infraestrutura</h3>
+            <div id="detail-amenities" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="px-6 py-4 bg-surface border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 shrink-0">
+          <div class="flex items-center gap-2">
+            <button
+              id="detail-edit-btn"
+              type="button"
+              class="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors"
+            >
+              ✎ Editar Imóvel
+            </button>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <button
+              id="detail-simulate-btn"
+              type="button"
+              class="px-4 py-2.5 rounded-xl border border-navy/25 text-navy hover:bg-navy/5 text-xs font-semibold transition-colors"
+            >
+              Simular Financiamento
+            </button>
+            <button
+              id="detail-schedule-btn"
+              type="button"
+              class="px-5 py-2.5 rounded-xl bg-navy hover:bg-navy-dark text-white text-xs font-semibold shadow-sm transition-colors"
+            >
+              Agendar Visita Privativa
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- ADD / EDIT PROPERTY MODAL -->
+    <div
+      id="property-modal"
+      class="fixed inset-0 z-50 bg-graphite/75 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto flex items-center justify-center"
+      hidden
+    >
+      <section
+        class="bg-white w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 my-auto max-h-[92vh] overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
+        <div class="flex items-start justify-between gap-4 pb-5 border-b border-slate-200">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-widest text-amber">Gestão de Portfólio</span>
+            <h2 id="modal-title" class="font-heading font-extrabold text-2xl text-graphite mt-0.5">Adicionar imóvel</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Preencha os dados técnicos da propriedade para publicação imediata.</p>
+          </div>
+          <button
+            id="modal-close"
+            type="button"
+            class="w-9 h-9 rounded-xl border border-slate-200 text-slate-500 hover:text-graphite hover:bg-slate-50 flex items-center justify-center text-xl"
+            aria-label="Fechar formulário"
+          >
+            ×
+          </button>
+        </div>
+
+        <form id="property-form" class="mt-6 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label class="sm:col-span-2 block">
+              <span class="text-xs font-semibold text-slate-700">Título da Propriedade <span class="text-amber">*</span></span>
+              <input
+                name="name"
+                required
+                maxlength="90"
+                placeholder="Ex.: Penthouse Duplex Jardim Europa"
+                class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-navy"
+              />
+            </label>
+
+            <label class="block">
+              <span class="text-xs font-semibold text-slate-700">Tipologia <span class="text-amber">*</span></span>
+              <select
+                name="type"
+                required
+                class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:border-navy"
+              >
+                <option value="Cobertura">Cobertura</option>
+                <option value="Mansão">Mansão</option>
+                <option value="Apartamento">Apartamento</option>
+                <option value="Casa">Casa</option>
+                <option value="Comercial">Comercial</option>
+                <option value="Terreno">Terreno</option>
+              </select>
+            </label>
+
+            <label class="block">
+              <span class="text-xs font-semibold text-slate-700">Status <span class="text-amber">*</span></span>
+              <select
+                name="status"
+                required
+                class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:border-navy"
+              >
+                <option value="Disponível">Disponível</option>
+                <option value="Alugado">Alugado</option>
+                <option value="Vendido">Vendido</option>
+              </select>
+            </label>
+
+            <label class="block">
+              <span class="text-xs font-semibold text-slate-700">Valor (R$) <span class="text-amber">*</span></span>
+              <input
+                name="price"
+                type="number"
+                min="1"
+                step="1"
+                required
+                placeholder="12500000"
+                class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-navy"
+              />
+            </label>
+
+            <label class="block">
+              <span class="text-xs font-semibold text-slate-700">Área Privativa (m²) <span class="text-amber">*</span></span>
+              <input
+                name="area"
+                type="number"
+                min="1"
+                step="1"
+                required
+                placeholder="420"
+                class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-navy"
+              />
+            </label>
+
+            <div class="sm:col-span-2 grid grid-cols-3 gap-3">
+              <label class="block">
+                <span class="text-xs font-semibold text-slate-700">Quartos</span>
+                <input
+                  name="beds"
+                  type="number"
+                  min="0"
+                  max="30"
+                  value="4"
+                  class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-navy"
+                />
+              </label>
+              <label class="block">
+                <span class="text-xs font-semibold text-slate-700">Banheiros</span>
+                <input
+                  name="baths"
+                  type="number"
+                  min="0"
+                  max="30"
+                  value="5"
+                  class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-navy"
+                />
+              </label>
+              <label class="block">
+                <span class="text-xs font-semibold text-slate-700">Vagas</span>
+                <input
+                  name="parking"
+                  type="number"
+                  min="0"
+                  max="30"
+                  value="4"
+                  class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-navy"
+                />
+              </label>
+            </div>
+
+            <label class="block">
+              <span class="text-xs font-semibold text-slate-700">Endereço / Bairro <span class="text-amber">*</span></span>
+              <input
+                name="address"
+                required
+                maxlength="120"
+                placeholder="Jardim Europa — São Paulo, SP"
+                class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-navy"
+              />
+            </label>
+
+            <label class="block">
+              <span class="text-xs font-semibold text-slate-700">Arquiteto / Assinatura</span>
+              <input
+                name="architect"
+                maxlength="80"
+                placeholder="Ex.: Studio Arthur Casas"
+                class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-navy"
+              />
+            </label>
+
+            <label class="sm:col-span-2 block">
+              <span class="text-xs font-semibold text-slate-700">URL da Fotografia Principal (Unsplash)</span>
+              <input
+                name="image"
+                type="url"
+                placeholder="https://images.unsplash.com/photo-..."
+                class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-navy"
+              />
+            </label>
+
+            <label class="sm:col-span-2 block">
+              <span class="text-xs font-semibold text-slate-700">Memorial Descritivo</span>
+              <textarea
+                name="description"
+                rows="3"
+                maxlength="500"
+                placeholder="Descreva os acabamentos, vista, insolação e diferenciais exclusivos..."
+                class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-navy"
+              ></textarea>
+            </label>
+          </div>
+
+          <div id="modal-error" class="text-xs text-red-600 font-medium" role="alert" hidden></div>
+
+          <div class="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+            <button
+              id="cancel-modal"
+              type="button"
+              class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold"
+            >
+              Cancelar
+            </button>
+            <button
+              id="save-property"
+              type="submit"
+              class="px-6 py-2.5 rounded-xl bg-navy hover:bg-navy-dark text-white text-xs font-semibold shadow-md shadow-navy/20"
+            >
+              Publicar Imóvel
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div
+      id="toast"
+      role="status"
+      aria-live="polite"
+      class="toast fixed bottom-6 right-6 z-50 px-5 py-3.5 rounded-2xl bg-graphite text-white text-xs font-semibold shadow-2xl border border-slate-700 flex items-center gap-2.5"
+    ></div>
+  </body>
+</html>
